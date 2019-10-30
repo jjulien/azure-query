@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"></script>
+</head>
+<body>
+   
+<div id="success" style="display:none;">
+        <h4>You have logged into Microsoft Azure!</h4>
+        <p>You can close this window</p>
+</div>
+<div id="fail" style="display:none;">
+        <h4>Some failures occurred during the authentication</h4>
+</div>
+<script type="text/javascript">
+    let token = window.location.hash.split("&")[0].split("=")[1];
+     $.post("/", {token: token}, function(data, status, xhr) {
+         if (data['status'] == "success") {
+            $('#success').show();
+         } else {
+            $('#fail').show();
+         }
+     }) 
+</script>
+</body>
+</html>
