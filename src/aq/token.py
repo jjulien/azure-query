@@ -17,8 +17,10 @@ class AzureOAuth2Token():
             self.raw_token = self.get_cached_token()
         else:
             self.raw_token = raw_token
-        self.headers = json.loads(base64.b64decode(self.raw_token.split('.')[0]))
-        self.decoded_token = self.decode_token()
+
+        if self.valid():
+            self.headers = json.loads(base64.b64decode(self.raw_token.split('.')[0]))
+            self.decoded_token = self.decode_token()
 
     def valid(self):
         # TODO: Need to also check expiration
