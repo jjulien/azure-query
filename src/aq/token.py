@@ -12,6 +12,7 @@ class AzureOAuth2Token():
     CACHED_DIRECTORY = '.aq'
     CACHED_TOKEN_FILENAME = 'token'
     CACHED_JWKS_FILENAME = "jwks"
+    JWKS_URL = "https://login.microsoftonline.com/common/discovery/keys"
 
     def __init__(self, raw_token=None):
         if raw_token == None:
@@ -37,20 +38,42 @@ class AzureOAuth2Token():
         return os.path.join(self.get_cache_dir(), AzureOAuth2Token.CACHED_TOKEN_FILENAME)
     
     def get_cached_jwks_filename(self):
-        return os.path.join(self.get_cache_diur(), CACHED_JWKS_FILENAME)
+        return os.path.join(self.get_cache_dir(), AzureOAuth2Token.CACHED_JWKS_FILENAME)
     
     def setup_cache(self):
         cache_dir = self.get_cache_dir()
         if not os.path.isdir(cache_dir):
             os.mkdir(cache_dir, mode=0o700)
 
-    def get_jwk_with_id(self, jwks_id):
-        jwks_url = 'https://login.microsoftonline.com/common/discovery/keys'
-        response = requests.get(jwks_url)
-        json_response = json.loads(response.text)
-        for k in json_response['keys']:
-            if k["kid"] == jwks_id:
-                return k
+    def get_cached_jwks(self):
+        cached_jwks_filename = self.get_cached_jwks_filename()
+        if os.path.exists(cached_jwks_filename):
+            with open(cached_jwks_filename) as jwks_file:
+                cached_jwks = jwks_file.read()
+            return json.loads(cached_jwks)
+
+    def get_fresh_jwks(self):
+        response = requests.get(AzureOAuth2Token.JWKS_URL)
+        return json.loads(response.text)
+
+    def __get_jwk_with_id(self, jwks, jwk_id):
+        if jwks:
+            for jwk in jwks['keys']:
+                if jwk["kid"] == jwk_id:
+                    return jwk
+
+    def cache_jwks(self, jwks):
+        with open(self.get_cached_jwks_filename(), 'w') as jwks_file:
+            jwks_file.write(json.dumps(jwks))
+
+    def get_jwk_with_id(self, jwk_id):
+        jwks = self.get_cached_jwks()
+        jwk = self.__get_jwk_with_id(jwks, jwk_id)
+        if not jwk:
+            jwks = self.get_fresh_jwks()
+            self.cache_jwks(jwks)
+            jwk = self.__get_jwk_with_id(jwks, jwk_id)
+        return jwk
 
     def get_cached_token(self, leeway=60):
         cached_token_filename = self.get_cached_token_filename()
