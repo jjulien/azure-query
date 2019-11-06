@@ -122,7 +122,6 @@ class ClientRedirectHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             return
 
         landing_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'auth_landing_pages', 'handle-response.html')
-        print(f"opening file {landing_file}")
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
