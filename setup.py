@@ -15,7 +15,7 @@ https://docs.microsoft.com/en-us/graph/api/overview?view=graph-rest-1.0
 
 setuptools.setup(
     name="azure-query",
-    version="0.0.1",
+    version="0.0.2",
     scripts=["bin/aq"],
     author="John Julien",
     author_email="john@julinfamily.com",
@@ -29,6 +29,12 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OSX"
-    ] 
+        "Operating System :: MacOS :: MacOS X"
+    ],
+    install_requires=[
+        "PyJWT",
+        "requests",
+        "cryptography",
+        "six"
+    ]
 ) 
