@@ -15,6 +15,7 @@ class AzureOAuth2Token():
     JWKS_URL = "https://login.microsoftonline.com/common/discovery/keys"
 
     def __init__(self, raw_token=None):
+        self.setup_cache()
         if raw_token == None:
             self.raw_token = self.get_cached_token()
         else:
