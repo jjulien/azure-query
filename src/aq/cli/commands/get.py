@@ -7,9 +7,10 @@ class Command(ODataAPICommand):
 
     description = "Executes HTTP GET functionality against the Microsoft Graph REST API"
     path = "/me"
+    parsed = None
 
     def run(self):
-        api = AzureGraphAPI(self.login.token)
+        api = AzureGraphAPI(self.login.token, beta=self.parsed.beta)
         response = api.get(self.path, query_params=self.query_params)
         print(json.dumps(response, indent=4))
 
@@ -17,8 +18,8 @@ class Command(ODataAPICommand):
         super().parse_args()
         self.sub_parser.add_argument("path", help="The path to do an HTTP GET on from https://graph.microsoft.com/v1.0.  "
                                              "Examples: /me, /users")
-        parsed = self.parser.parse_args()
-        self.path = parsed.path
+        self.parsed = self.parser.parse_args()
+        self.path = self.parsed.path
 
     def display_extra_help(self):
         print("\nExample:")

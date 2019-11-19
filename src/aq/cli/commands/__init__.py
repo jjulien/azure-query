@@ -16,6 +16,7 @@ class AQCommand:
         self.parser = argparse.ArgumentParser()
         subparsers = self.parser.add_subparsers(help=self.description)
         self.sub_parser = subparsers.add_parser(name)
+        self.sub_parser.add_argument("--beta", action="store_true", default=False)
         self.parse_args()
 
     # This method should be used if your application requires any arg parsing
