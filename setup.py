@@ -15,7 +15,7 @@ https://docs.microsoft.com/en-us/graph/api/overview?view=graph-rest-1.0
 
 setuptools.setup(
     name="azure-query",
-    version="0.0.3",
+    version="0.0.4",
     scripts=["bin/aq"],
     author="John Julien",
     author_email="john@julinfamily.com",
