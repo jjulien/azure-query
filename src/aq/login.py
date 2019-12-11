@@ -6,15 +6,18 @@ import os
 import json
 
 class AzureGraphAPILogin():
-    # Graph API Client ID
-    PROD_AZURE_CLIENTID = "de8bc8b5-d9f9-48b1-a8ad-b748da725064"
-    
+    # Graph Explorer Client ID
+    DEFAULT_CLIENT_ID = "de8bc8b5-d9f9-48b1-a8ad-b748da725064"
+
+    # Default multi-tenant tenant id
+    DEFAULT_TENANT_ID = "common"
+
     # OAuth Token Endpoint
-    BASE_OAUTH_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize'
+    BASE_OAUTH_URL_FORMAT = 'https://login.microsoftonline.com/%s/oauth2/v2.0/authorize'
     
     # These are the default scopes used by the online Graph API explorer 
     # https://developer.microsoft.com/en-us/graph/graph-explorer
-    OAUTH_SCOPES = [
+    DEFAULT_OAUTH_SCOPES = [
       "openid",
       "profile",
       "User.ReadWrite",
@@ -31,7 +34,14 @@ class AzureGraphAPILogin():
 
     token = None
 
-    def __init__(self):
+    def __init__(self,
+                 client_id=DEFAULT_CLIENT_ID,
+                 tenant_id=DEFAULT_TENANT_ID,
+                 oauth_scopes=DEFAULT_OAUTH_SCOPES):
+        self.client_id = client_id
+        self.base_oauth_url = AzureGraphAPILogin.BASE_OAUTH_URL_FORMAT % tenant_id
+        self.oauth_scopes = oauth_scopes
+
         self.token = AzureOAuth2Token()
         if not self.token.valid():
             self.token = AzureOAuth2Token(self.do_web_login())
@@ -50,15 +60,15 @@ class AzureGraphAPILogin():
           "response_mode": "fragment",
           "prompt": "select_account",
           "mkt": "en-US",
-          "client_id": AzureGraphAPILogin.PROD_AZURE_CLIENTID,
+          "client_id": self.client_id,
           "response_type": "token",
           "redirect_uri": "http://localhost:8400",
           "state": request_state,
-          "scope": " ".join(AzureGraphAPILogin.OAUTH_SCOPES)
+          "scope": " ".join(self.oauth_scopes)
         }
 
         url_arg_string = urllib.parse.urlencode(url_arguments, quote_via=urllib.parse.quote)
-        full_url = "%s?%s" % (AzureGraphAPILogin.BASE_OAUTH_URL, url_arg_string)
+        full_url = "%s?%s" % (self.base_oauth_url, url_arg_string)
         
         web_server = ClientRedirectServer(('localhost', 8400), ClientRedirectHandler)
     
